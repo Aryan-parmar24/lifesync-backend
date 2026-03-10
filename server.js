@@ -16,7 +16,7 @@ const app=express();
 app.use(cors({
     origin: [
         "http://localhost:5173",
-        "https://your-app.vercel.app", // ✅ your vercel URL
+        "https://lifesync-frontend-nu.vercel.app",
     ],
     credentials: true,
 }));
