@@ -4,23 +4,18 @@ const sendEmail = require("../utils/sendEmail");
 
 cron.schedule("* * * * *", async () => {
     try {
-        const now = new Date();
-
-        // ✅ Add 5:30 hours to convert UTC to IST
-        const istOffset = 5.5 * 60 * 60 * 1000;
-        const istNow = new Date(now.getTime() + istOffset);
-
-        console.log("⏰ Cron running at UTC:", now.toISOString());
-        console.log("⏰ IST time:", istNow.toISOString());
+        const now = new Date(); // pure UTC
+        console.log("⏰ Cron UTC now:", now.toISOString());
 
         const tasks = await Task.find({
-            reminderTime: { $lte: istNow },
+            reminderTime: { $lte: now }, // ✅ compare UTC vs UTC
             status: "Pending",
         }).populate("user");
 
         console.log("📋 Tasks found:", tasks.length);
 
         for (const task of tasks) {
+            console.log("🔍 Task reminder time:", task.reminderTime);
             try {
                 await sendEmail(
                     task.user.email,
