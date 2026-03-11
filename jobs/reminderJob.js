@@ -7,9 +7,12 @@ cron.schedule("*/15 * * * *", async () => {
         const now = new Date();
         console.log("⏰ Cron UTC now:", now.toISOString());
 
-        // ✅ Auto mark missed tasks — deadline passed + still Pending
+        // ✅ Only mark missed if deadline was BEFORE today (not today!)
+        const startOfToday = new Date(now);
+        startOfToday.setUTCHours(0, 0, 0, 0);
+
         const missedTasks = await Task.find({
-            deadline: { $lt: now },
+            deadline: { $lt: startOfToday }, // strictly before today
             status: "Pending",
         });
 
@@ -18,11 +21,7 @@ cron.schedule("*/15 * * * *", async () => {
             console.log("❌ Marked as missed:", task.title);
         }
 
-        if (missedTasks.length > 0) {
-            console.log(`📌 ${missedTasks.length} tasks marked as missed`);
-        }
-
-        // ✅ Send reminders for pending tasks whose reminderTime has passed
+        // Send reminders
         const reminderTasks = await Task.find({
             reminderTime: { $lte: now },
             status: "Pending",
@@ -31,7 +30,6 @@ cron.schedule("*/15 * * * *", async () => {
         console.log("📋 Reminder tasks found:", reminderTasks.length);
 
         for (const task of reminderTasks) {
-            console.log("🔍 Task reminder time:", task.reminderTime);
             try {
                 await sendEmail(
                     task.user.email,

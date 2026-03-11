@@ -1,4 +1,6 @@
 require("dotenv").config();
+const https = require("https");
+const RENDER_URL = "https://lifesync-backend-mm9r.onrender.com";
 console.log("EMAIL_USER:", process.env.EMAIL_USER);
 console.log("EMAIL_PASS:", process.env.EMAIL_PASS);
 const express=require('express');
@@ -20,6 +22,13 @@ app.use(cors({
     ],
     credentials: true,
 }));
+setInterval(() => {
+    https.get(RENDER_URL, (res) => {
+        console.log("✅ Keep alive ping:", res.statusCode);
+    }).on("error", (err) => {
+        console.log("❌ Ping error:", err.message);
+    });
+}, 14 * 60 * 1000);
 app.use(express.json());
 //this prevents API abuse
 app.use(helmet());
