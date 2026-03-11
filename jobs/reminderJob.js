@@ -2,7 +2,7 @@ const cron = require("node-cron");
 const Task = require("../models/Task");
 const sendEmail = require("../utils/sendEmail");
 
-cron.schedule("* * * * *", async () => {
+cron.schedule("*/15 * * * *", async () => {
     try {
         const now = new Date();
         console.log("⏰ Cron UTC now:", now.toISOString());

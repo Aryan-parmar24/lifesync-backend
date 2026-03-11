@@ -34,7 +34,7 @@ app.use(errorHandler);
 app.get("/",(req,res)=>{
     res.send("LifeSync is Running.....");
 });
-
+require("./jobs/reminderJob");
 mongoose.connect(process.env.MONGO_URI)
     .then(()=>console.log("monogoDB is connected"))
     .catch(err=>console.log(err));
